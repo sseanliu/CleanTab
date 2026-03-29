@@ -86,5 +86,12 @@ export function handleMetadataExtracted(metadata: ExtractedMetadata) {
     description: metadata.ogDescription || metadata.description,
     ogImage: metadata.ogImage,
     headings: metadata.headings,
+    contentType: metadata.contentType,
+    schemaType: metadata.schemaType,
+    author: metadata.author,
+    publishedDate: metadata.publishedDate,
+    siteName: metadata.siteName,
+    keywords: metadata.keywords,
+    excerpt: metadata.excerpt,
   }).catch(console.error)
 }

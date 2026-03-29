@@ -18,6 +18,12 @@ export interface PageContent {
   ogImage: string | null
   headings: string[]
   contentType: string | null
+  schemaType: string | null
+  author: string | null
+  publishedDate: string | null
+  siteName: string | null
+  keywords: string[]
+  excerpt: string | null
   firstSeenAt: number
   lastSeenAt: number
   visitCount: number
@@ -43,6 +49,13 @@ export interface ExtractedMetadata {
   headings: string[]
   canonicalUrl: string | null
   lang: string | null
+  schemaType: string | null
+  author: string | null
+  publishedDate: string | null
+  siteName: string | null
+  keywords: string[]
+  excerpt: string | null
+  contentType: string
 }
 
 export type Message =

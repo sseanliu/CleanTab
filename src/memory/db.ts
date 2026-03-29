@@ -111,6 +111,12 @@ export async function upsertPageContent(
           ogImage: null,
           headings: [],
           contentType: null,
+          schemaType: null,
+          author: null,
+          publishedDate: null,
+          siteName: null,
+          keywords: [],
+          excerpt: null,
           firstSeenAt: now,
           lastSeenAt: now,
           visitCount: 1,
@@ -131,6 +137,12 @@ export async function updatePageMetadata(
     ogImage?: string | null
     headings?: string[]
     contentType?: string | null
+    schemaType?: string | null
+    author?: string | null
+    publishedDate?: string | null
+    siteName?: string | null
+    keywords?: string[]
+    excerpt?: string | null
   }
 ): Promise<void> {
   const db = await openDB()
@@ -146,6 +158,12 @@ export async function updatePageMetadata(
         if (metadata.ogImage !== undefined) existing.ogImage = metadata.ogImage
         if (metadata.headings !== undefined) existing.headings = metadata.headings
         if (metadata.contentType !== undefined) existing.contentType = metadata.contentType
+        if (metadata.schemaType !== undefined) existing.schemaType = metadata.schemaType
+        if (metadata.author !== undefined) existing.author = metadata.author
+        if (metadata.publishedDate !== undefined) existing.publishedDate = metadata.publishedDate
+        if (metadata.siteName !== undefined) existing.siteName = metadata.siteName
+        if (metadata.keywords !== undefined) existing.keywords = metadata.keywords
+        if (metadata.excerpt !== undefined) existing.excerpt = metadata.excerpt
         store.put(existing)
       }
     }
@@ -200,7 +218,11 @@ export async function searchPages(query: string, limit: number = 50): Promise<Pa
         page.title.toLowerCase().includes(lowerQuery) ||
         page.normalizedUrl.toLowerCase().includes(lowerQuery) ||
         (page.description?.toLowerCase().includes(lowerQuery) ?? false) ||
-        page.headings.some(h => h.toLowerCase().includes(lowerQuery))
+        page.headings.some(h => h.toLowerCase().includes(lowerQuery)) ||
+        (page.author?.toLowerCase().includes(lowerQuery) ?? false) ||
+        (page.excerpt?.toLowerCase().includes(lowerQuery) ?? false) ||
+        page.keywords.some(k => k.toLowerCase().includes(lowerQuery)) ||
+        (page.contentType?.toLowerCase().includes(lowerQuery) ?? false)
 
       if (matches) {
         results.push(page)
