@@ -5,8 +5,12 @@ import SearchBar from './components/SearchBar'
 import DomainSection from './components/DomainSection'
 import ActionBar from './components/ActionBar'
 import EmptyState from './components/EmptyState'
+import HistoryView from './components/history/HistoryView'
+
+type View = 'tabs' | 'history'
 
 export default function App() {
+  const [view, setView] = useState<View>('tabs')
   const [groups, setGroups] = useState<DomainGroup[]>([])
   const [search, setSearch] = useState('')
   const [selectedTabs, setSelectedTabs] = useState<Set<number>>(new Set())
@@ -132,8 +136,42 @@ export default function App() {
     setSelectedTabs(new Set())
   }
 
+  if (view === 'history') {
+    return (
+      <div className="w-[400px] h-[500px] flex flex-col bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">
+        <div className="flex items-center border-b border-neutral-200 dark:border-neutral-700">
+          <button
+            onClick={() => setView('tabs')}
+            className="flex-1 px-3 py-2 text-sm text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+          >
+            Tabs
+          </button>
+          <button
+            className="flex-1 px-3 py-2 text-sm font-medium text-blue-500 border-b-2 border-blue-500"
+          >
+            History
+          </button>
+        </div>
+        <HistoryView />
+      </div>
+    )
+  }
+
   return (
     <div className="w-[400px] h-[500px] flex flex-col bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">
+      <div className="flex items-center border-b border-neutral-200 dark:border-neutral-700">
+        <button
+          className="flex-1 px-3 py-2 text-sm font-medium text-blue-500 border-b-2 border-blue-500"
+        >
+          Tabs
+        </button>
+        <button
+          onClick={() => setView('history')}
+          className="flex-1 px-3 py-2 text-sm text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+        >
+          History
+        </button>
+      </div>
       <SearchBar value={search} onChange={setSearch} />
 
       <div className="px-3 py-1.5 flex items-center justify-between border-b border-neutral-100 dark:border-neutral-800">
