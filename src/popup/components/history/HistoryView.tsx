@@ -1,32 +1,34 @@
 import { useState, useEffect, useCallback } from 'react'
-import type { PageContent, BrowsingStats } from '../../../memory/types'
+import type { PageContent } from '../../../memory/types'
+import { getRecentPages, searchPages, getStats } from '../../../memory/db'
 import HistorySearchBar from './HistorySearchBar'
 import HistoryItem from './HistoryItem'
 
 export default function HistoryView() {
   const [pages, setPages] = useState<PageContent[]>([])
   const [search, setSearch] = useState('')
-  const [stats, setStats] = useState<BrowsingStats | null>(null)
+  const [statsText, setStatsText] = useState('')
   const [loading, setLoading] = useState(true)
 
-  const loadData = useCallback((query: string) => {
+  const loadData = useCallback(async (query: string) => {
     setLoading(true)
-    chrome.runtime.sendMessage(
-      { type: 'QUERY_HISTORY', payload: { query: query || undefined, limit: 100 } },
-      (response) => {
-        if (response?.payload) {
-          setPages(response.payload)
-        }
-        setLoading(false)
-      }
-    )
+    try {
+      const results = query
+        ? await searchPages(query, 100)
+        : await getRecentPages(100)
+      setPages(results)
+    } catch (err) {
+      console.error('Failed to load history:', err)
+      setPages([])
+    }
+    setLoading(false)
   }, [])
 
   useEffect(() => {
     loadData('')
-    chrome.runtime.sendMessage({ type: 'GET_STATS' }, (response) => {
-      if (response?.payload) setStats(response.payload)
-    })
+    getStats().then((s) => {
+      setStatsText(`${s.uniquePages} pages, ${s.totalEvents} visits`)
+    }).catch(() => {})
   }, [loadData])
 
   useEffect(() => {
@@ -51,13 +53,9 @@ export default function HistoryView() {
     <div className="flex flex-col h-full">
       <HistorySearchBar value={search} onChange={setSearch} />
 
-      {stats && !search && (
-        <div className="px-3 pb-2 flex items-center gap-3 text-[10px] text-neutral-400">
-          <span>{stats.uniquePages} pages</span>
-          <span>{stats.totalEvents} visits</span>
-          {stats.topDomains[0] && (
-            <span>Top: {stats.topDomains[0].domain}</span>
-          )}
+      {statsText && !search && (
+        <div className="px-3 pb-2 text-[10px] text-neutral-400">
+          {statsText}
         </div>
       )}
 
