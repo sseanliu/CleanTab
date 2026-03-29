@@ -10,6 +10,7 @@ export default function App() {
   const [groups, setGroups] = useState<DomainGroup[]>([])
   const [search, setSearch] = useState('')
   const [selectedTabs, setSelectedTabs] = useState<Set<number>>(new Set())
+  const [allExpanded, setAllExpanded] = useState(true)
 
   const loadTabs = useCallback(async () => {
     const tabs = await getAllTabs()
@@ -119,14 +120,24 @@ export default function App() {
 
       <div className="px-3 py-1.5 flex items-center justify-between border-b border-neutral-100 dark:border-neutral-800">
         <span className="text-xs text-neutral-500">{totalCount} tabs</span>
-        {totalCount > 0 && selectedTabs.size === 0 && (
-          <button
-            onClick={handleSelectAll}
-            className="text-xs text-blue-500 hover:text-blue-600"
-          >
-            Select all
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          {totalCount > 0 && (
+            <button
+              onClick={() => setAllExpanded(!allExpanded)}
+              className="text-xs text-blue-500 hover:text-blue-600"
+            >
+              {allExpanded ? 'Collapse all' : 'Expand all'}
+            </button>
+          )}
+          {totalCount > 0 && selectedTabs.size === 0 && (
+            <button
+              onClick={handleSelectAll}
+              className="text-xs text-blue-500 hover:text-blue-600"
+            >
+              Select all
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto">
@@ -143,6 +154,7 @@ export default function App() {
               onDeselectGroup={handleDeselectGroup}
               onNavigateTab={handleNavigateTab}
               onCloseTab={handleCloseTab}
+              forceExpanded={allExpanded}
             />
           ))
         )}

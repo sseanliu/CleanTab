@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { DomainGroup } from '../../core/types'
 import TabRow from './TabRow'
 
@@ -10,6 +10,7 @@ interface DomainSectionProps {
   onDeselectGroup: (tabIds: number[]) => void
   onNavigateTab: (tabId: number) => void
   onCloseTab: (tabId: number) => void
+  forceExpanded: boolean
 }
 
 export default function DomainSection({
@@ -20,8 +21,13 @@ export default function DomainSection({
   onDeselectGroup,
   onNavigateTab,
   onCloseTab,
+  forceExpanded,
 }: DomainSectionProps) {
   const [expanded, setExpanded] = useState(true)
+
+  useEffect(() => {
+    setExpanded(forceExpanded)
+  }, [forceExpanded])
 
   const groupTabIds = group.tabs.map((t) => t.id)
   const selectedInGroup = group.tabs.filter((t) => selectedTabs.has(t.id)).length
