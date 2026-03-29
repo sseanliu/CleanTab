@@ -4,12 +4,13 @@ import { getFaviconUrl } from '../../core/domain-utils'
 interface TabRowProps {
   tab: TabInfo
   selected: boolean
+  isDuplicate: boolean
   onSelect: (tabId: number) => void
   onNavigate: (tabId: number) => void
   onClose: (tabId: number) => void
 }
 
-export default function TabRow({ tab, selected, onSelect, onNavigate, onClose }: TabRowProps) {
+export default function TabRow({ tab, selected, isDuplicate, onSelect, onNavigate, onClose }: TabRowProps) {
   const faviconSrc = tab.favIconUrl || getFaviconUrl(tab.url)
 
   return (
@@ -42,6 +43,11 @@ export default function TabRow({ tab, selected, onSelect, onNavigate, onClose }:
       <span className="flex-1 text-sm text-neutral-800 dark:text-neutral-200 truncate" title={tab.title}>
         {tab.title}
       </span>
+      {isDuplicate && (
+        <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">
+          dup
+        </span>
+      )}
       <button
         onClick={(e) => {
           e.stopPropagation()

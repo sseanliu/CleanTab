@@ -11,6 +11,7 @@ interface DomainSectionProps {
   onNavigateTab: (tabId: number) => void
   onCloseTab: (tabId: number) => void
   forceExpanded: boolean
+  duplicateTabs: Set<number>
 }
 
 export default function DomainSection({
@@ -22,6 +23,7 @@ export default function DomainSection({
   onNavigateTab,
   onCloseTab,
   forceExpanded,
+  duplicateTabs,
 }: DomainSectionProps) {
   const [expanded, setExpanded] = useState(true)
 
@@ -82,6 +84,7 @@ export default function DomainSection({
               key={tab.id}
               tab={tab}
               selected={selectedTabs.has(tab.id)}
+              isDuplicate={duplicateTabs.has(tab.id)}
               onSelect={onSelectTab}
               onNavigate={onNavigateTab}
               onClose={onCloseTab}

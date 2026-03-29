@@ -58,7 +58,9 @@ export default function App() {
   const allTabs = groups.flatMap((g) => g.tabs)
   const allTabIds = filteredGroups.flatMap((g) => g.tabs.map((t) => t.id))
   const totalCount = allTabIds.length
-  const duplicateCount = findDuplicateTabIds(allTabs).length
+  const duplicateIds = findDuplicateTabIds(allTabs)
+  const duplicateSet = new Set(duplicateIds)
+  const duplicateCount = duplicateIds.length
 
   const handleSelectTab = (tabId: number) => {
     setSelectedTabs((prev) => {
@@ -108,10 +110,17 @@ export default function App() {
     setSelectedTabs(new Set())
   }
 
-  const handleCloseDuplicates = async () => {
-    const ids = findDuplicateTabIds(allTabs)
-    if (ids.length > 0) {
-      await closeTabs(ids)
+  const duplicatesSelected = duplicateIds.length > 0 && duplicateIds.every((id) => selectedTabs.has(id))
+
+  const handleToggleDuplicates = () => {
+    if (duplicatesSelected) {
+      setSelectedTabs((prev) => {
+        const next = new Set(prev)
+        for (const id of duplicateIds) next.delete(id)
+        return next
+      })
+    } else {
+      setSelectedTabs(new Set(duplicateIds))
     }
   }
 
@@ -132,10 +141,10 @@ export default function App() {
         <div className="flex items-center gap-3">
           {duplicateCount > 0 && (
             <button
-              onClick={handleCloseDuplicates}
-              className="text-xs text-red-500 hover:text-red-600"
+              onClick={handleToggleDuplicates}
+              className={`text-xs ${duplicatesSelected ? 'text-neutral-500 hover:text-neutral-600' : 'text-red-500 hover:text-red-600'}`}
             >
-              Close {duplicateCount} duplicates
+              {duplicatesSelected ? 'Deselect duplicates' : `${duplicateCount} duplicates`}
             </button>
           )}
           {totalCount > 0 && (
@@ -172,6 +181,7 @@ export default function App() {
               onNavigateTab={handleNavigateTab}
               onCloseTab={handleCloseTab}
               forceExpanded={allExpanded}
+              duplicateTabs={duplicateSet}
             />
           ))
         )}
