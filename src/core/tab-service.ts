@@ -2,7 +2,7 @@ import type { TabInfo, DomainGroup } from './types'
 import { extractDomain, getFriendlyName } from './domain-utils'
 
 export async function getAllTabs(): Promise<TabInfo[]> {
-  const tabs = await chrome.tabs.query({ currentWindow: true })
+  const tabs = await chrome.tabs.query({})
   return tabs
     .filter((tab) => tab.id !== undefined)
     .map((tab) => {
@@ -57,7 +57,10 @@ export async function closeTabs(tabIds: number[]): Promise<void> {
 }
 
 export async function navigateToTab(tabId: number): Promise<void> {
-  await chrome.tabs.update(tabId, { active: true })
+  const tab = await chrome.tabs.update(tabId, { active: true })
+  if (tab?.windowId) {
+    await chrome.windows.update(tab.windowId, { focused: true })
+  }
 }
 
 export function findDuplicateTabIds(tabs: TabInfo[]): number[] {
