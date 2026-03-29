@@ -59,3 +59,27 @@ export async function closeTabs(tabIds: number[]): Promise<void> {
 export async function navigateToTab(tabId: number): Promise<void> {
   await chrome.tabs.update(tabId, { active: true })
 }
+
+export function findDuplicateTabIds(tabs: TabInfo[]): number[] {
+  const seen = new Map<string, number>()
+  const duplicateIds: number[] = []
+
+  for (const tab of tabs) {
+    if (!tab.url || tab.url === 'chrome://newtab/') continue
+    if (seen.has(tab.url)) {
+      duplicateIds.push(tab.id)
+    } else {
+      seen.set(tab.url, tab.id)
+    }
+  }
+
+  return duplicateIds
+}
+
+export async function closeDuplicates(tabs: TabInfo[]): Promise<number> {
+  const ids = findDuplicateTabIds(tabs)
+  if (ids.length > 0) {
+    await chrome.tabs.remove(ids)
+  }
+  return ids.length
+}

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { DomainGroup } from '../core/types'
-import { getAllTabs, groupByDomain, closeTab, closeTabs, navigateToTab } from '../core/tab-service'
+import { getAllTabs, groupByDomain, closeTab, closeTabs, navigateToTab, findDuplicateTabIds } from '../core/tab-service'
 import SearchBar from './components/SearchBar'
 import DomainSection from './components/DomainSection'
 import ActionBar from './components/ActionBar'
@@ -55,8 +55,10 @@ export default function App() {
         .filter((group) => group.tabs.length > 0)
     : groups
 
+  const allTabs = groups.flatMap((g) => g.tabs)
   const allTabIds = filteredGroups.flatMap((g) => g.tabs.map((t) => t.id))
   const totalCount = allTabIds.length
+  const duplicateCount = findDuplicateTabIds(allTabs).length
 
   const handleSelectTab = (tabId: number) => {
     setSelectedTabs((prev) => {
@@ -106,6 +108,13 @@ export default function App() {
     setSelectedTabs(new Set())
   }
 
+  const handleCloseDuplicates = async () => {
+    const ids = findDuplicateTabIds(allTabs)
+    if (ids.length > 0) {
+      await closeTabs(ids)
+    }
+  }
+
   const handleSelectAll = () => {
     setSelectedTabs(new Set(allTabIds))
   }
@@ -121,6 +130,14 @@ export default function App() {
       <div className="px-3 py-1.5 flex items-center justify-between border-b border-neutral-100 dark:border-neutral-800">
         <span className="text-xs text-neutral-500">{totalCount} tabs</span>
         <div className="flex items-center gap-3">
+          {duplicateCount > 0 && (
+            <button
+              onClick={handleCloseDuplicates}
+              className="text-xs text-red-500 hover:text-red-600"
+            >
+              Close {duplicateCount} duplicates
+            </button>
+          )}
           {totalCount > 0 && (
             <button
               onClick={() => setAllExpanded(!allExpanded)}
