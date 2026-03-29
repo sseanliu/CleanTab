@@ -69,6 +69,22 @@ export default function App() {
     })
   }
 
+  const handleSelectGroup = (tabIds: number[]) => {
+    setSelectedTabs((prev) => {
+      const next = new Set(prev)
+      for (const id of tabIds) next.add(id)
+      return next
+    })
+  }
+
+  const handleDeselectGroup = (tabIds: number[]) => {
+    setSelectedTabs((prev) => {
+      const next = new Set(prev)
+      for (const id of tabIds) next.delete(id)
+      return next
+    })
+  }
+
   const handleNavigateTab = async (tabId: number) => {
     await navigateToTab(tabId)
     window.close()
@@ -123,6 +139,8 @@ export default function App() {
               group={group}
               selectedTabs={selectedTabs}
               onSelectTab={handleSelectTab}
+              onSelectGroup={handleSelectGroup}
+              onDeselectGroup={handleDeselectGroup}
               onNavigateTab={handleNavigateTab}
               onCloseTab={handleCloseTab}
             />
